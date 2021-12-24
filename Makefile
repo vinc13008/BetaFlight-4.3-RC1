@@ -462,6 +462,9 @@ all_all: $(VALID_TARGETS)
 ## unified : build all Unified Targets
 unified: $(UNIFIED_TARGETS)
 
+## targets allowed for volume limitation strategy
+targets-vol-lim: $(VOL_LIM_TARGETS)
+
 ## unified_zip : build all Unified Targets as zip files (for posting on GitHub)
 unified_zip: $(addsuffix _clean,$(UNIFIED_TARGETS)) $(addsuffix _zip,$(UNIFIED_TARGETS))
 

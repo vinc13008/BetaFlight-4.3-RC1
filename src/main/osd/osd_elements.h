@@ -43,7 +43,7 @@ typedef struct osdElementParms_s {
 } osdElementParms_t;
 
 typedef void (*osdElementDrawFn)(osdElementParms_t *element);
-
+extern char djiWarningBuffer[12];
 int osdConvertTemperatureToSelectedUnit(int tempInDegreesCelcius);
 void osdFormatDistanceString(char *result, int distance, char leadingSymbol);
 bool osdFormatRtcDateTime(char *buffer);

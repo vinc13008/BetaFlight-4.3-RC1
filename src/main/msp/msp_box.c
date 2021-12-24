@@ -51,6 +51,7 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT] = {
     { BOXANGLE, "ANGLE", 1 },
     { BOXHORIZON, "HORIZON", 2 },
 //    { BOXBARO, "BARO", 3 },
+    { BOXALTHOLD, "ALT HOLD", 3 },
     { BOXANTIGRAVITY, "ANTI GRAVITY", 4 },
     { BOXMAG, "MAG", 5 },
     { BOXHEADFREE, "HEADFREE", 6 },
@@ -59,6 +60,7 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT] = {
 //    { BOXCAMTRIG, "CAMTRIG", 9 },
 //    { BOXGPSHOME, "GPS HOME", 10 },
 //    { BOXGPSHOLD, "GPS HOLD", 11 },
+    { BOXSAFEHOLD, "SAFE HOLD", 11 },
     { BOXPASSTHRU, "PASSTHRU", 12 },
     { BOXBEEPERON, "BEEPER", 13 },
 //    { BOXLEDMAX, "LEDMAX", 14 }, (removed)
@@ -89,8 +91,8 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT] = {
     { BOXVTXPITMODE, "VTX PIT MODE", 39 },
     { BOXUSER1, "USER1", 40 },
     { BOXUSER2, "USER2", 41 },
-    { BOXUSER3, "USER3", 42 },
-    { BOXUSER4, "USER4", 43 },
+    //{ BOXUSER3, "USER3", 42 },
+    //{ BOXUSER4, "USER4", 43 },
     { BOXPIDAUDIO, "PID AUDIO", 44 },
     { BOXPARALYZE, "PARALYZE", 45 },
     { BOXGPSRESCUE, "GPS RESCUE", 46 },
@@ -142,10 +144,6 @@ void serializeBoxNameFn(sbuf_t *dst, const box_t *box)
         sbufWriteString(dst, modeActivationConfig()->box_user_1_name);
     } else if (box->boxId == BOXUSER2 && strlen(modeActivationConfig()->box_user_2_name) > 0) {
         sbufWriteString(dst, modeActivationConfig()->box_user_2_name);
-    } else if (box->boxId == BOXUSER3 && strlen(modeActivationConfig()->box_user_3_name) > 0) {
-        sbufWriteString(dst, modeActivationConfig()->box_user_3_name);
-    } else if (box->boxId == BOXUSER4 && strlen(modeActivationConfig()->box_user_4_name) > 0) {
-        sbufWriteString(dst, modeActivationConfig()->box_user_4_name);
     } else
 #endif
     {
@@ -220,6 +218,10 @@ void initActiveBoxIds(void)
             BME(BOXGPSRESCUE);
         }
 #endif
+    if (!featureIsEnabled(FEATURE_3D)) {
+        BME(BOXALTHOLD);
+        BME(BOXSAFEHOLD);
+        }
         BME(BOXBEEPGPSCOUNT);
     }
 #endif
@@ -307,8 +309,8 @@ void initActiveBoxIds(void)
                 switch(box->boxId) {
                 case BOXUSER1:
                 case BOXUSER2:
-                case BOXUSER3:
-                case BOXUSER4:
+                //case BOXUSER3:
+                //case BOXUSER4:
                     BME(box->boxId);
                     break;
                 default:

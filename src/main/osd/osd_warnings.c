@@ -49,6 +49,7 @@
 #include "flight/imu.h"
 #include "flight/mixer.h"
 #include "flight/pid.h"
+#include "flight/volume_limitation.h"
 
 #include "io/beeper.h"
 
@@ -222,6 +223,35 @@ void renderOsdWarning(char *warningText, bool *blinking, uint8_t *displayAttr)
     }
 
 #endif // USE_GPS_RESCUE
+    
+// Volume limitation OSD warnings
+    if (getVolLimAlert().distance == 2) {
+        tfp_sprintf(warningText, "PAS DE GEOFENCE");
+        *displayAttr = DISPLAYPORT_ATTR_WARNING;
+        *blinking = true;;
+        return;
+        }
+    if(getVolLimAlert().sensorFailure == 1) {
+        tfp_sprintf(warningText, "ERREUR CAPTEUR");
+        *displayAttr = DISPLAYPORT_ATTR_WARNING;
+        *blinking = true;;
+        return;
+    } else if(getVolLimAlert().altitude == 1) {
+        tfp_sprintf(warningText, "ALTI MAX");
+        *displayAttr = DISPLAYPORT_ATTR_WARNING;
+        *blinking = true;;
+        return;
+    } else if(getVolLimAlert().distance == 1) {
+        tfp_sprintf(warningText, "DIST MAX");
+        *displayAttr = DISPLAYPORT_ATTR_WARNING;
+        *blinking = true;;
+        return;
+    } else if(getVolLimAlert().safeHold == 1) {
+        tfp_sprintf(warningText, "BARRIERE MODE");
+        *displayAttr = DISPLAYPORT_ATTR_WARNING;
+        *blinking = true;;
+        return;
+    }
 
     // Show warning if in HEADFREE flight mode
     if (FLIGHT_MODE(HEADFREE_MODE)) {

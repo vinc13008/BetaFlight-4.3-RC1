@@ -49,6 +49,7 @@
 #include "flight/mixer.h"
 #include "flight/rpm_filter.h"
 #include "flight/feedforward.h"
+#include "flight/volume_limitation.h"
 
 #include "io/gps.h"
 
@@ -421,6 +422,10 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     // calculate error angle and limit the angle to the max inclination
     // rcDeflection is in range [-1.0, 1.0]
     float angle = pidProfile->levelAngleLimit * getLevelModeRcDeflection(axis);
+    if (FLIGHT_MODE(SAFE_HOLD_MODE)) {
+    angle += safeHold_angle[axis];
+    // SafeHold regulation in degrees
+    }
 #ifdef USE_GPS_RESCUE
     angle += gpsRescueAngle[axis] / 100; // ANGLE IS IN CENTIDEGREES
 #endif

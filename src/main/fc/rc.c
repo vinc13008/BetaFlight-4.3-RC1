@@ -44,6 +44,7 @@
 #include "flight/feedforward.h"
 #include "flight/gps_rescue.h"
 #include "flight/pid_init.h"
+#include "flight/volume_limitation.h"
 
 #include "pg/rx.h"
 
@@ -597,6 +598,14 @@ FAST_CODE void processRcCommand(void)
                 rcDeflectionAbs[axis] = 0;
             } else
 #endif
+            if ((axis == FD_YAW) && FLIGHT_MODE(SAFE_HOLD_MODE)) {
+// If GPS Rescue is active then override the setpointRate used in the
+// pid controller with the value calculated from the desired heading logic.
+                angleRate = gpsHoldGetYawRate();
+// Treat the stick input as centered to avoid any stick deflection base modifications (like acceleration limit)
+                rcDeflection[axis] = 0;
+                rcDeflectionAbs[axis] = 0;
+            } else
             {
                 // scale rcCommandf to range [-1.0, 1.0]
                 float rcCommandf;

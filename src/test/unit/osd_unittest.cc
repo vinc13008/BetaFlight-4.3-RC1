@@ -1187,6 +1187,78 @@ TEST_F(OsdTest, TestConvertTemperatureUnits)
     EXPECT_EQ(osdConvertTemperatureToSelectedUnit(41), 106);
 }
 
+/*
+ * Tests the warnings are not showing for DJI OSD.
+ */
+TEST_F(OsdTest, TestElementWarningDJIDisabled)
+{
+    // given
+    osdConfigMutable()->enabledWarnings = 0;  // disable all warnings
+    osdWarnSetState(OSD_WARNING_BATTERY_WARNING, true);
+
+   // when
+    displayClearScreen(&testDisplayPort);
+    osdRefresh(simulationTime);
+
+    // then
+    for (int i = 0; i < 12; i++) {
+        EXPECT_EQ(NULL, djiWarningBuffer[i]);
+    }
+
+    // low battery
+    simulationBatteryVoltage = 1400;
+    simulationBatteryState = BATTERY_WARNING;
+
+    // when
+    displayClearScreen(&testDisplayPort);
+    osdRefresh(simulationTime);
+
+    // then
+    for (int i = 0; i < 12; i++) {
+        EXPECT_EQ(NULL, djiWarningBuffer[i]);
+    }
+}
+
+/*
+ * Tests the warnings are shown for DJI OSD.
+ */
+TEST_F(OsdTest, TestElementWarningDJIEnabled)
+{
+    // given
+    osdConfigMutable()->enabledWarnings = 0;  // disable all warnings
+    osdWarnSetState(OSD_WARNING_BATTERY_WARNING, true);
+    osdWarnSetState(OSD_WARNING_DJI, true);
+
+    // low battery
+    simulationBatteryVoltage = 1400;
+    simulationBatteryState = BATTERY_WARNING;
+
+    // when
+    displayClearScreen(&testDisplayPort);
+    osdRefresh(simulationTime);
+
+    // then
+    char stringLow[12] = "LOW BATTERY";
+    for (int i = 0; i < 12; i++) {
+        EXPECT_EQ(stringLow[i], djiWarningBuffer[i]);
+    }
+
+    // and
+    // used battery
+    simulationBatteryVoltage = ((batteryConfig()->vbatmaxcellvoltage - 20) * simulationBatteryCellCount) - 1;
+    simulationBatteryState = BATTERY_OK;
+
+    // when
+    displayClearScreen(&testDisplayPort);
+    osdRefresh(simulationTime);
+
+    // then
+    char stringEmpty[12] = "           ";
+    for (int i = 0; i < 12; i++) {
+        EXPECT_EQ(stringEmpty[i], djiWarningBuffer[i]);
+   }
+}
+
 TEST_F(OsdTest, TestGpsElements)
 {
     // given

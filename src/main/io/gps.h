@@ -142,6 +142,7 @@ extern char gpsPacketLog[GPS_PACKET_LOG_ENTRY_COUNT];
 
 extern int32_t GPS_home[2];
 extern uint16_t GPS_distanceToHome;        // distance to home point in meters
+extern uint32_t GPS_distanceToHomeCM; // distance to home point in cm
 extern int16_t GPS_directionToHome;        // direction to home or hol point in degrees
 extern uint32_t GPS_distanceFlownInCm;     // distance flown since armed in centimeters
 extern int16_t GPS_verticalSpeedInCmS;     // vertical speed in cm/s

@@ -142,6 +142,7 @@
 #include "flight/imu.h"
 #include "flight/mixer.h"
 #include "flight/pid.h"
+#include "flight/volume_limitation.h"
 
 #include "io/gps.h"
 #include "io/vtx.h"
@@ -228,6 +229,8 @@ static uint32_t blinkBits[(OSD_ITEM_COUNT + 31) / 32];
 #define BLINK(item) (IS_BLINK(item) && blinkState)
 
 enum {UP, DOWN};
+
+char djiWarningBuffer[12];
 
 static int osdDisplayWrite(osdElementParms_t *element, uint8_t x, uint8_t y, uint8_t attr, const char *s)
 {
@@ -982,6 +985,10 @@ static void osdElementFlymode(osdElementParms_t *element)
         strcpy(element->buff, "!FS!");
     } else if (FLIGHT_MODE(GPS_RESCUE_MODE)) {
         strcpy(element->buff, "RESC");
+    } else if (FLIGHT_MODE(SAFE_HOLD_MODE)) {
+        strcpy(element->buff, "DIST");
+    } else if (FLIGHT_MODE(ALTHOLD_MODE)) {
+        strcpy(element->buff, "ALTI");
     } else if (FLIGHT_MODE(HEADFREE_MODE)) {
         strcpy(element->buff, "HEAD");
     } else if (FLIGHT_MODE(ANGLE_MODE)) {
@@ -1774,6 +1781,15 @@ static void osdDrawSingleElement(displayPort_t *osdDisplayPort, uint8_t item)
     osdElementDrawFunction[item](&element);
     if (element.drawElement) {
         osdDisplayWrite(&element, elemPosX, elemPosY, element.attr, buff);
+    // Save warning for DJI
+    if (item == OSD_WARNINGS && osdWarnDjiEnabled()) {
+    if (strlen(buff)) {
+        tfp_sprintf(djiWarningBuffer, buff);
+    } else {
+    // Set an empty string, because if the warning is NULL, DJI will display CRAFT_NAME
+        tfp_sprintf(djiWarningBuffer, "           ");
+            }
+        }
     }
 }
 

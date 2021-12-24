@@ -52,6 +52,7 @@
 #include "flight/mixer_tricopter.h"
 #include "flight/pid.h"
 #include "flight/rpm_filter.h"
+#include "flight/volume_limitation.h"
 
 #include "pg/rx.h"
 
@@ -445,6 +446,15 @@ static void applyMixerAdjustment(float *motorMix, const float motorMixMin, const
     throttle += pidGetAirmodeThrottleOffset();
     float airmodeThrottleChange = 0;
 #endif
+    
+    // Altitude limitation
+    throttle = volLimitation_AltitudeLim(throttle);
+/************ ALTHOLD MODE activation ***************/
+    if (FLIGHT_MODE(ALTHOLD_MODE)) {
+            throttle = volLimitation_AltitudeHold(1);
+    } else {
+            volLimitation_AltitudeHold(0);
+        }
 
     if (motorMixRange > 1.0f) {
         for (int i = 0; i < mixerRuntime.motorCount; i++) {

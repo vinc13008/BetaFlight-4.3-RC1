@@ -53,6 +53,7 @@
 #include "flight/imu.h"
 #include "flight/pid.h"
 #include "flight/gps_rescue.h"
+#include "flight/volume_limitation.h"
 
 #include "scheduler/scheduler.h"
 
@@ -80,6 +81,7 @@ static char *gpsPacketLogChar = gpsPacketLog;
 // **********************
 int32_t GPS_home[2];
 uint16_t GPS_distanceToHome;        // distance to home point in meters
+uint32_t GPS_distanceToHomeCM; // distance to home point in cm
 int16_t GPS_directionToHome;        // direction to home or hol point in degrees
 uint32_t GPS_distanceFlownInCm;     // distance flown since armed in centimeters
 int16_t GPS_verticalSpeedInCmS;     // vertical speed in cm/s
@@ -877,6 +879,7 @@ void gpsUpdate(timeUs_t currentTimeUs)
         updateGPSRescueState();
     }
 #endif
+    volLimitation_SensorUpdate();
 }
 
 static void gpsNewData(uint16_t c)
@@ -1822,6 +1825,7 @@ void GPS_calculateDistanceAndDirectionToHome(void)
         int32_t dir;
         GPS_distance_cm_bearing(&gpsSol.llh.lat, &gpsSol.llh.lon, &GPS_home[GPS_LATITUDE], &GPS_home[GPS_LONGITUDE], &dist, &dir);
         GPS_distanceToHome = dist / 100;
+        GPS_distanceToHomeCM = dist;
         GPS_directionToHome = dir / 100;
     } else {
         GPS_distanceToHome = 0;
@@ -1853,6 +1857,7 @@ void onGpsNewData(void)
 #ifdef USE_GPS_RESCUE
     rescueNewGpsData();
 #endif
+    volLimitation_NewGpsData();
 }
 
 void gpsSetFixState(bool state)
